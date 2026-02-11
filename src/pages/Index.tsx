@@ -1,6 +1,5 @@
 import { useState, useCallback } from "react";
 import { StockSelector } from "@/components/StockSelector";
-import { ParameterControls } from "@/components/ParameterControls";
 import { TerminalLog } from "@/components/TerminalLog";
 import { DocumentPreview } from "@/components/DocumentPreview";
 import { analyzeStock, listReports, getReportDetail } from "@/lib/api";
@@ -8,9 +7,6 @@ import type { ReportDetail } from "@/lib/api-types";
 
 const Index = () => {
   const [selectedTicker, setSelectedTicker] = useState("AAPL");
-  const [timeframe, setTimeframe] = useState("3M");
-  const [sensitivity, setSensitivity] = useState("MED");
-  const [includeVolume, setIncludeVolume] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const [reportReady, setReportReady] = useState(false);
   const [currentReport, setCurrentReport] = useState<ReportDetail | null>(null);
@@ -95,18 +91,6 @@ const Index = () => {
 
             <div className="w-full h-px bg-border" />
 
-            <ParameterControls
-              timeframe={timeframe}
-              onTimeframeChange={setTimeframe}
-              sensitivity={sensitivity}
-              onSensitivityChange={setSensitivity}
-              includeVolume={includeVolume}
-              onIncludeVolumeChange={setIncludeVolume}
-              disabled={isProcessing}
-            />
-
-            <div className="w-full h-px bg-border" />
-
             {/* Terminal Log */}
             <TerminalLog
               isRunning={isProcessing}
@@ -147,10 +131,6 @@ const Index = () => {
             </div>
             <div className="flex items-center gap-3 font-mono text-[10px] text-muted-foreground">
               <span>TICKER: {selectedTicker}</span>
-              <span>|</span>
-              <span>TF: {timeframe}</span>
-              <span>|</span>
-              <span>SENS: {sensitivity}</span>
             </div>
           </div>
 

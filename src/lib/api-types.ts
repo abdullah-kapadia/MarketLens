@@ -45,12 +45,28 @@ export interface KeyLevels {
   target: number;
 }
 
+export interface ChartDataPoint {
+  date: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+  sma_9?: number;
+  sma_50?: number;
+  sma_200?: number;
+  rsi?: number;
+  upper_bb?: number;
+  lower_bb?: number;
+}
+
 export interface ChartConfig {
   ticker: string;
   period: string;
   overlays: string[];
   annotations: string[];
   style: ChartStyle;
+  data: ChartDataPoint[];
 }
 
 export interface AgentResult {
@@ -63,6 +79,7 @@ export interface AgentResult {
   evidence_chain: string[];
   risk_factors: string[];
   chart_config: ChartConfig;
+  final_commentary: string;
 }
 
 export type AgentStepType = "reasoning" | "tool_call" | "observation" | "complete" | "error";

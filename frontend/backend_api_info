@@ -1,0 +1,920 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "MarketLens Backend",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/v1/analyze/{ticker}": {
+      "post": {
+        "summary": "Analyze Stock",
+        "operationId": "analyze_stock_api_v1_analyze__ticker__post",
+        "parameters": [
+          {
+            "name": "ticker",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ticker"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports": {
+      "get": {
+        "summary": "List Reports",
+        "operationId": "list_reports_api_v1_reports_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "ticker",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ticker"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/{report_id}": {
+      "get": {
+        "summary": "Get Report Detail",
+        "operationId": "get_report_detail_api_v1_reports__report_id__get",
+        "parameters": [
+          {
+            "name": "report_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Report Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/{report_id}/pdf": {
+      "get": {
+        "summary": "Get Report Pdf",
+        "operationId": "get_report_pdf_api_v1_reports__report_id__pdf_get",
+        "parameters": [
+          {
+            "name": "report_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Report Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stocks": {
+      "get": {
+        "summary": "List Stocks",
+        "operationId": "list_stocks_api_v1_stocks_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stocks/{ticker}/summary": {
+      "get": {
+        "summary": "Get Stock Summary",
+        "operationId": "get_stock_summary_api_v1_stocks__ticker__summary_get",
+        "parameters": [
+          {
+            "name": "ticker",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ticker"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "summary": "Health Check",
+        "operationId": "health_check_api_v1_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health Check Root",
+        "operationId": "health_check_root_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AgentResult": {
+        "properties": {
+          "thesis": {
+            "type": "string",
+            "title": "Thesis"
+          },
+          "signal": {
+            "type": "string",
+            "enum": [
+              "BULLISH",
+              "BEARISH",
+              "NEUTRAL"
+            ],
+            "title": "Signal"
+          },
+          "confidence": {
+            "type": "string",
+            "enum": [
+              "HIGH",
+              "MEDIUM",
+              "LOW"
+            ],
+            "title": "Confidence"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          },
+          "detailed_analysis": {
+            "$ref": "#/components/schemas/DetailedAnalysis"
+          },
+          "key_levels": {
+            "$ref": "#/components/schemas/KeyLevels"
+          },
+          "evidence_chain": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Evidence Chain"
+          },
+          "risk_factors": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Risk Factors"
+          },
+          "chart_config": {
+            "$ref": "#/components/schemas/ChartConfig"
+          }
+        },
+        "type": "object",
+        "required": [
+          "thesis",
+          "signal",
+          "confidence",
+          "summary",
+          "detailed_analysis",
+          "key_levels",
+          "evidence_chain",
+          "risk_factors",
+          "chart_config"
+        ],
+        "title": "AgentResult"
+      },
+      "AgentStep": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "reasoning",
+              "tool_call",
+              "observation",
+              "complete",
+              "error"
+            ],
+            "title": "Type"
+          },
+          "content": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content"
+          },
+          "tool_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tool Name"
+          },
+          "tool_input": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tool Input"
+          },
+          "iteration": {
+            "type": "integer",
+            "title": "Iteration"
+          },
+          "timestamp": {
+            "type": "string",
+            "title": "Timestamp"
+          },
+          "report_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Report Id"
+          },
+          "analysis": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AgentResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "execution_time_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Execution Time Ms"
+          },
+          "tool_calls_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tool Calls Count"
+          },
+          "code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "iteration",
+          "timestamp"
+        ],
+        "title": "AgentStep"
+      },
+      "ChartConfig": {
+        "properties": {
+          "ticker": {
+            "type": "string",
+            "title": "Ticker"
+          },
+          "period": {
+            "type": "string",
+            "title": "Period"
+          },
+          "overlays": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Overlays"
+          },
+          "annotations": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Annotations"
+          },
+          "style": {
+            "type": "string",
+            "enum": [
+              "dark",
+              "light"
+            ],
+            "title": "Style"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ticker",
+          "period",
+          "overlays",
+          "annotations",
+          "style"
+        ],
+        "title": "ChartConfig"
+      },
+      "DetailedAnalysis": {
+        "properties": {
+          "trend": {
+            "type": "string",
+            "title": "Trend"
+          },
+          "momentum": {
+            "type": "string",
+            "title": "Momentum"
+          },
+          "key_levels": {
+            "type": "string",
+            "title": "Key Levels"
+          },
+          "volume_context": {
+            "type": "string",
+            "title": "Volume Context"
+          },
+          "market_context": {
+            "type": "string",
+            "title": "Market Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "trend",
+          "momentum",
+          "key_levels",
+          "volume_context",
+          "market_context"
+        ],
+        "title": "DetailedAnalysis"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "llm_provider": {
+            "type": "string",
+            "title": "Llm Provider"
+          },
+          "llm_fallback": {
+            "type": "string",
+            "title": "Llm Fallback"
+          },
+          "stocks_available": {
+            "type": "integer",
+            "title": "Stocks Available"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "llm_provider",
+          "llm_fallback",
+          "stocks_available",
+          "version"
+        ],
+        "title": "HealthResponse"
+      },
+      "KeyLevels": {
+        "properties": {
+          "support": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Support"
+          },
+          "resistance": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Resistance"
+          },
+          "stop_loss": {
+            "type": "number",
+            "title": "Stop Loss"
+          },
+          "target": {
+            "type": "number",
+            "title": "Target"
+          }
+        },
+        "type": "object",
+        "required": [
+          "support",
+          "resistance",
+          "stop_loss",
+          "target"
+        ],
+        "title": "KeyLevels"
+      },
+      "ReportDetail": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "ticker": {
+            "type": "string",
+            "title": "Ticker"
+          },
+          "signal": {
+            "type": "string",
+            "enum": [
+              "BULLISH",
+              "BEARISH",
+              "NEUTRAL"
+            ],
+            "title": "Signal"
+          },
+          "confidence": {
+            "type": "string",
+            "enum": [
+              "HIGH",
+              "MEDIUM",
+              "LOW"
+            ],
+            "title": "Confidence"
+          },
+          "thesis": {
+            "type": "string",
+            "title": "Thesis"
+          },
+          "generated_at": {
+            "type": "string",
+            "title": "Generated At"
+          },
+          "tool_calls_count": {
+            "type": "integer",
+            "title": "Tool Calls Count"
+          },
+          "execution_time_ms": {
+            "type": "integer",
+            "title": "Execution Time Ms"
+          },
+          "analysis": {
+            "$ref": "#/components/schemas/AgentResult"
+          },
+          "reasoning_trace": {
+            "items": {
+              "$ref": "#/components/schemas/AgentStep"
+            },
+            "type": "array",
+            "title": "Reasoning Trace"
+          },
+          "pdf_url": {
+            "type": "string",
+            "title": "Pdf Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "ticker",
+          "signal",
+          "confidence",
+          "thesis",
+          "generated_at",
+          "tool_calls_count",
+          "execution_time_ms",
+          "analysis",
+          "reasoning_trace",
+          "pdf_url"
+        ],
+        "title": "ReportDetail"
+      },
+      "ReportListResponse": {
+        "properties": {
+          "reports": {
+            "items": {
+              "$ref": "#/components/schemas/ReportSummary"
+            },
+            "type": "array",
+            "title": "Reports"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reports",
+          "total"
+        ],
+        "title": "ReportListResponse"
+      },
+      "ReportSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "ticker": {
+            "type": "string",
+            "title": "Ticker"
+          },
+          "signal": {
+            "type": "string",
+            "enum": [
+              "BULLISH",
+              "BEARISH",
+              "NEUTRAL"
+            ],
+            "title": "Signal"
+          },
+          "confidence": {
+            "type": "string",
+            "enum": [
+              "HIGH",
+              "MEDIUM",
+              "LOW"
+            ],
+            "title": "Confidence"
+          },
+          "thesis": {
+            "type": "string",
+            "title": "Thesis"
+          },
+          "generated_at": {
+            "type": "string",
+            "title": "Generated At"
+          },
+          "tool_calls_count": {
+            "type": "integer",
+            "title": "Tool Calls Count"
+          },
+          "execution_time_ms": {
+            "type": "integer",
+            "title": "Execution Time Ms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "ticker",
+          "signal",
+          "confidence",
+          "thesis",
+          "generated_at",
+          "tool_calls_count",
+          "execution_time_ms"
+        ],
+        "title": "ReportSummary"
+      },
+      "Stock": {
+        "properties": {
+          "ticker": {
+            "type": "string",
+            "title": "Ticker"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "sector": {
+            "type": "string",
+            "title": "Sector"
+          },
+          "current_price": {
+            "type": "number",
+            "title": "Current Price"
+          },
+          "change_percent": {
+            "type": "number",
+            "title": "Change Percent"
+          },
+          "last_updated": {
+            "type": "string",
+            "title": "Last Updated"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ticker",
+          "name",
+          "sector",
+          "current_price",
+          "change_percent",
+          "last_updated"
+        ],
+        "title": "Stock"
+      },
+      "StockListResponse": {
+        "properties": {
+          "stocks": {
+            "items": {
+              "$ref": "#/components/schemas/Stock"
+            },
+            "type": "array",
+            "title": "Stocks"
+          }
+        },
+        "type": "object",
+        "required": [
+          "stocks"
+        ],
+        "title": "StockListResponse"
+      },
+      "StockSummary": {
+        "properties": {
+          "ticker": {
+            "type": "string",
+            "title": "Ticker"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "sector": {
+            "type": "string",
+            "title": "Sector"
+          },
+          "current_price": {
+            "type": "number",
+            "title": "Current Price"
+          },
+          "change_percent": {
+            "type": "number",
+            "title": "Change Percent"
+          },
+          "period_high": {
+            "type": "number",
+            "title": "Period High"
+          },
+          "period_low": {
+            "type": "number",
+            "title": "Period Low"
+          },
+          "avg_volume": {
+            "type": "integer",
+            "title": "Avg Volume"
+          },
+          "last_5_days": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Last 5 Days"
+          },
+          "indicators_snapshot": {
+            "type": "object",
+            "title": "Indicators Snapshot"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ticker",
+          "name",
+          "sector",
+          "current_price",
+          "change_percent",
+          "period_high",
+          "period_low",
+          "avg_volume",
+          "last_5_days",
+          "indicators_snapshot"
+        ],
+        "title": "StockSummary"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

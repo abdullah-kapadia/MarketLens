@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.env
+.venv/
+.mypy_cache/
+.pytest_cache/
+*.db
+output/
+output/reports/
+output/charts/
+.DS_Store
+Thumbs.db
+

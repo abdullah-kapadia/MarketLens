@@ -1,0 +1,90 @@
+<style>
+h1 { font-family: helvetica; font-size: 18px; color: #1e40af; }
+h2 { font-family: helvetica; font-size: 14px; color: #1e40af; margin-top: 15px; }
+h3 { font-family: helvetica; font-size: 12px; color: #1e40af; margin-top: 10px; }
+p { font-family: helvetica; font-size: 10px; text-align: justify; }
+li { font-family: helvetica; font-size: 9px; }
+table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+td, th { border: 1px solid #ccc; padding: 5px; font-size: 9px; }
+th { background-color: #eff6ff; color: #1e40af; font-weight: bold; }
+</style>
+
+<h1>{{ ticker }} Technical Analysis Report</h1>
+<p><b>Generated:</b> {{ generated_at }}<br/>
+<b>Current Price:</b> PKR {{ current_price }}<br/>
+<b>Signal:</b> {{ signal | upper }}<br/>
+<b>Confidence:</b> {{ confidence | upper }}</p>
+
+<hr/>
+
+<h2>{{ thesis }}</h2>
+<p>{{ summary }}</p>
+
+{% if chart_base64 %}
+<h3>Technical Chart</h3>
+<center>
+<img src="data:image/png;base64,{{ chart_base64 }}" width="450" />
+</center>
+{% endif %}
+
+<h3>Price Structure</h3>
+<p>{{ detailed_analysis.price_structure }}</p>
+
+<h3>Momentum Analysis</h3>
+<p>{{ detailed_analysis.momentum }}</p>
+
+<h3>Volume Profile</h3>
+<p>{{ detailed_analysis.volume }}</p>
+
+<h3>Market Context</h3>
+<p>{{ detailed_analysis.market_relative }}</p>
+
+<h2>Key Price Levels</h2>
+<table>
+<tr>
+  <th>Level Type</th>
+  <th>Price</th>
+</tr>
+<tr>
+  <td><b>Immediate Support</b></td>
+  <td>{{ key_levels.immediate_support }}</td>
+</tr>
+<tr>
+  <td><b>Secondary Support</b></td>
+  <td>{{ key_levels.secondary_support }}</td>
+</tr>
+<tr>
+  <td><b>Immediate Resistance</b></td>
+  <td>{{ key_levels.immediate_resistance }}</td>
+</tr>
+<tr>
+  <td><b>Secondary Resistance</b></td>
+  <td>{{ key_levels.secondary_resistance }}</td>
+</tr>
+</table>
+
+<h2>Trading Strategy</h2>
+<p><b>Bias:</b> {{ strategy.bias }}</p>
+<p><b>Entry Zones:</b> {{ strategy.entry_zones }}</p>
+<p><b>Profit Taking:</b> {{ strategy.profit_taking }}</p>
+<p><b>Invalidation:</b> {{ strategy.invalidation }}</p>
+
+<h2>Supporting Evidence</h2>
+<ul>
+{% for evidence in evidence_chain %}
+<li>{{ evidence }}</li>
+{% endfor %}
+</ul>
+
+<h2>Risk Factors</h2>
+<ul>
+{% for risk in risk_factors %}
+<li>{{ risk }}</li>
+{% endfor %}
+</ul>
+
+<hr/>
+<p style="font-size: 8px; color: #666; text-align: center;">
+Weekly Report | Pakistan Technicals<br/>
+Our technical view on individual stocks may differ from our fundamental recommendations.
+</p>

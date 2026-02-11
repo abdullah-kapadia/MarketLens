@@ -6,8 +6,6 @@ from backend.pdf import generate_pdf
 
 app = FastAPI(title="Market Lens Backend")
 
-ALLOWED_SYMBOLS = {"OGDC", "PSO", "TRG", "KSE100"}
-
 @app.post("/generate-report")
 def generate_report(req: AIRequest):
     ai_data = get_ai_report(req.symbol)

@@ -1,0 +1,11 @@
+venv/
+__pycache__/
+*.pyc
+.env
+.git/
+.gitignore
+*.md
+output/reports/*.pdf
+data/marketlens.db
+.pytest_cache/
+.mypy_cache/

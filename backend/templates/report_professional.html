@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>MarketLens Report</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #ffffff;
+      color: #1a1a1a;
+      line-height: 1.5;
+      margin: 0;
+      padding: 20px;
+    }
+    .header {
+      border-bottom: 3px solid #2563eb;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+    }
+    .header h1 {
+      color: #1e40af;
+      font-size: 18px;
+      margin: 0 0 5px 0;
+      font-weight: 600;
+    }
+    .header .meta {
+      color: #6b7280;
+      font-size: 9px;
+    }
+    .title-section {
+      margin-bottom: 15px;
+    }
+    .title-section h2 {
+      color: #1e40af;
+      font-size: 16px;
+      margin: 0 0 5px 0;
+      font-weight: 600;
+    }
+    .title-section .subtitle {
+      color: #4b5563;
+      font-size: 11px;
+      margin: 0;
+    }
+    .badge {
+      padding: 3px 8px;
+      border-radius: 3px;
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      margin-right: 5px;
+    }
+    .bullish {
+      background: #dcfce7;
+      color: #166534;
+    }
+    .bearish {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    .neutral {
+      background: #e5e7eb;
+      color: #374151;
+    }
+    .chart-section {
+      margin: 15px 0;
+      text-align: center;
+    }
+    .chart-section img {
+      max-width: 100%;
+      height: auto;
+    }
+    .analysis-section {
+      margin: 12px 0;
+    }
+    .analysis-section h3 {
+      color: #1e40af;
+      font-size: 12px;
+      margin: 8px 0 4px 0;
+      font-weight: 600;
+    }
+    .analysis-section p {
+      font-size: 10px;
+      color: #374151;
+      margin: 0 0 6px 0;
+      text-align: justify;
+    }
+    .levels-grid {
+      display: table;
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+    }
+    .levels-row {
+      display: table-row;
+    }
+    .levels-cell {
+      display: table-cell;
+      border: 1px solid #d1d5db;
+      padding: 6px;
+      font-size: 9px;
+    }
+    .levels-cell strong {
+      color: #1e40af;
+      display: block;
+      margin-bottom: 2px;
+      font-size: 10px;
+    }
+    .strategy-box {
+      background: #eff6ff;
+      border-left: 3px solid #2563eb;
+      padding: 10px;
+      margin: 10px 0;
+    }
+    .strategy-box p {
+      font-size: 10px;
+      color: #1e3a8a;
+      margin: 4px 0;
+    }
+    .strategy-box strong {
+      color: #1e40af;
+    }
+    ul {
+      margin: 5px 0;
+      padding-left: 20px;
+    }
+    li {
+      font-size: 9px;
+      color: #374151;
+      margin: 3px 0;
+    }
+    .footer {
+      margin-top: 20px;
+      padding-top: 10px;
+      border-top: 1px solid #e5e7eb;
+      font-size: 8px;
+      color: #9ca3af;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <h1>Weekly Report | Pakistan Technicals</h1>
+    <div class="meta">Generated: {{ generated_at }}</div>
+  </div>
+
+  <!-- Title Section -->
+  <div class="title-section">
+    <h2>{{ thesis }}</h2>
+    <p class="subtitle">{{ ticker }} - PKR {{ current_price }}</p>
+  </div>
+
+  <!-- Signal Badge -->
+  <div style="margin-bottom: 15px;">
+    {% set badge_class = "neutral" %}
+    {% if signal == "BULLISH" %}{% set badge_class = "bullish" %}{% endif %}
+    {% if signal == "BEARISH" %}{% set badge_class = "bearish" %}{% endif %}
+    <span class="badge {{ badge_class }}">{{ signal }}</span>
+    <span class="badge neutral">Confidence: {{ confidence }}</span>
+  </div>
+
+  <!-- Summary -->
+  <div class="analysis-section">
+    <p>{{ summary }}</p>
+  </div>
+
+  <!-- Chart -->
+  {% if chart_base64 %}
+  <div class="chart-section">
+    <img src="data:image/png;base64,{{ chart_base64 }}" />
+  </div>
+  {% endif %}
+
+  <!-- Detailed Analysis -->
+  <div class="analysis-section">
+    
+    {% if detailed_analysis.price_structure %}
+    <p>{{ detailed_analysis.price_structure }}</p>
+    {% endif %}
+    
+    {% if detailed_analysis.momentum %}
+    <p>{{ detailed_analysis.momentum }}</p>
+    {% endif %}
+    
+    {% if detailed_analysis.key_levels %}
+    <p>{{ detailed_analysis.key_levels }}</p>
+    {% endif %}
+    
+    {% if detailed_analysis.volume %}
+    <p>{{ detailed_analysis.volume }}</p>
+    {% endif %}
+    
+    {% if detailed_analysis.market_relative %}
+    <p>{{ detailed_analysis.market_relative }}</p>
+    {% endif %}
+  </div>
+
+  <!-- Strategy -->
+  {% if strategy %}
+  <div class="strategy-box">
+    <p><strong>Strategy:</strong> {{ strategy.bias|capitalize }} bias. {{ strategy.profit_taking }}. {{ strategy.invalidation }}</p>
+    {% if strategy.entry_zones %}
+    <p><strong>Entry zones:</strong> {{ strategy.entry_zones|join(', ') }}</p>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- Key Levels Table -->
+  {% if key_levels %}
+  <div class="analysis-section">
+    <h3>Key Price Levels</h3>
+    <div class="levels-grid">
+      <div class="levels-row">
+        {% if key_levels.immediate_support %}
+        <div class="levels-cell">
+          <strong>Support</strong>
+          {{ key_levels.immediate_support|join(', ') }}
+          {% if key_levels.secondary_support %}
+          <br>Secondary: {{ key_levels.secondary_support|join(', ') }}
+          {% endif %}
+        </div>
+        {% endif %}
+        {% if key_levels.immediate_resistance %}
+        <div class="levels-cell">
+          <strong>Resistance</strong>
+          {{ key_levels.immediate_resistance|join(', ') }}
+        </div>
+        {% endif %}
+      </div>
+      <div class="levels-row">
+        {% if key_levels.targets %}
+        <div class="levels-cell">
+          <strong>Targets</strong>
+          {{ key_levels.targets|join(', ') }}
+        </div>
+        {% endif %}
+        {% if key_levels.stop_loss %}
+        <div class="levels-cell">
+          <strong>Stop Loss</strong>
+          Below {{ key_levels.stop_loss }}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Evidence Chain -->
+  {% if evidence_chain %}
+  <div class="analysis-section">
+    <h3>Supporting Evidence</h3>
+    <ul>
+      {% for evidence in evidence_chain %}
+      <li>{{ evidence }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <!-- Risk Factors -->
+  {% if risk_factors %}
+  <div class="analysis-section">
+    <h3>Risk Factors</h3>
+    <ul>
+      {% for risk in risk_factors %}
+      <li>{{ risk }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <!-- Footer -->
+  <div class="footer">
+    Our technical view on individual stocks may differ from our fundamental recommendations.
+  </div>
+</body>
+</html>

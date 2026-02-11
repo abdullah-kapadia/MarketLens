@@ -1,0 +1,142 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Bone / Unbleached Paper */
+    --background: 43 33% 96%;
+    --foreground: 0 0% 4%;
+
+    --card: 40 20% 94%;
+    --card-foreground: 0 0% 4%;
+
+    --popover: 43 33% 96%;
+    --popover-foreground: 0 0% 4%;
+
+    /* Swiss Red */
+    --primary: 14 100% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 40 10% 90%;
+    --secondary-foreground: 0 0% 4%;
+
+    --muted: 40 10% 88%;
+    --muted-foreground: 0 0% 40%;
+
+    --accent: 14 100% 50%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 14 100% 50%;
+
+    --radius: 0px;
+
+    --sidebar-background: 40 20% 94%;
+    --sidebar-foreground: 0 0% 4%;
+    --sidebar-primary: 14 100% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 40 10% 88%;
+    --sidebar-accent-foreground: 0 0% 4%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 14 100% 50%;
+
+    /* Custom tokens */
+    --ink: 0 0% 4%;
+    --paper: 43 33% 96%;
+    --paper-elevated: 40 20% 94%;
+    --rule: 0 0% 20%;
+    --swiss-red: 14 100% 50%;
+    --terminal-green: 120 60% 40%;
+    --terminal-amber: 45 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'JetBrains Mono', monospace;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+  }
+}
+
+/* Terminal animation */
+@keyframes typewriter-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes slide-in-line {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.terminal-cursor {
+  animation: typewriter-blink 0.8s step-end infinite;
+}
+
+.terminal-line-enter {
+  animation: slide-in-line 0.15s ease-out forwards;
+}
+
+/* Cross-hatch pattern for chart placeholder */
+.crosshatch {
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 8px,
+      hsl(var(--rule) / 0.15) 8px,
+      hsl(var(--rule) / 0.15) 9px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 8px,
+      hsl(var(--rule) / 0.15) 8px,
+      hsl(var(--rule) / 0.15) 9px
+    );
+}
+
+/* Paper shadow for document preview */
+.paper-sheet {
+  box-shadow:
+    4px 4px 0px hsl(var(--ink) / 0.1),
+    8px 8px 0px hsl(var(--ink) / 0.05);
+}
+
+/* Brutalist input focus */
+.brutalist-focus:focus {
+  outline: 3px solid hsl(var(--swiss-red));
+  outline-offset: -3px;
+}
+
+/* Uppercase label style */
+.label-mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+}

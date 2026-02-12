@@ -583,7 +583,7 @@ npm run preview
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **LLM Providers**: OpenAI (GPT-4o) and Anthropic (Claude Sonnet)
 - **Technical Indicators**: pandas-ta library
@@ -592,13 +592,13 @@ npm run preview
 
 ---
 
-## 📄 License
+## License
 
 *To be determined*
 
 ---
 
-## 🚀 Future Enhancements
+## Future Enhancements
 
 - [ ] Add more PSX stocks (expand beyond MVP 5)
 - [ ] Historical report comparison

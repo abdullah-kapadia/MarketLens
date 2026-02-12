@@ -26,7 +26,7 @@ def _debug_enabled() -> bool:
 
 
 DEV_FRONTEND_URL = "http://localhost:8080"
-allowed_origins = [DEV_FRONTEND_URL]
+allowed_origins = [DEV_FRONTEND_URL, "http://localhost:8081"]
 if _debug_enabled():
     allowed_origins.append("*")
 
@@ -52,7 +52,7 @@ def _error_response(code: str, message: str, status_code: int = 400) -> JSONResp
     )
 
 
-@app.post("/api/v1/analyze/{ticker}")
+@app.get("/api/v1/analyze/{ticker}")
 async def analyze_stock(ticker: str) -> EventSourceResponse:
     try:
         load_dataframe(ticker, "6M")

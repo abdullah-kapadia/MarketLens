@@ -25,9 +25,15 @@ def _debug_enabled() -> bool:
     return os.getenv("DEBUG", "false").lower() == "true"
 
 
+DEV_FRONTEND_URL = "http://localhost:8080"
+allowed_origins = [DEV_FRONTEND_URL]
+if _debug_enabled():
+    allowed_origins.append("*")
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"] if _debug_enabled() else [],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -67,15 +73,15 @@ async def analyze_stock(ticker: str) -> EventSourceResponse:
             if step.type == "reasoning":
                 payload["content"] = step.content
             elif step.type == "tool_call":
-                payload["tool"] = step.tool_name
-                payload["args"] = step.tool_input
+                payload["tool_name"] = step.tool_name
+                payload["tool_input"] = step.tool_input
             elif step.type == "observation":
                 try:
                     payload["result"] = json.loads(step.content or "{}")
                 except json.JSONDecodeError:
                     payload["result"] = step.content
             elif step.type == "complete":
-                payload["run_id"] = step.report_id
+                payload["report_id"] = step.report_id
                 payload["analysis"] = step.analysis.model_dump() if step.analysis else None
                 payload["execution_time_ms"] = step.execution_time_ms
                 payload["tool_calls_count"] = step.tool_calls_count

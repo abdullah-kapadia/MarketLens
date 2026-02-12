@@ -11,6 +11,7 @@ from agents.tool_registry import TOOL_DEFINITIONS, dispatch
 from database import save_agent_step, save_report
 from models import AgentResult, AgentStep, ReportDetail
 from tools.chart_tools import generate_chart
+from tools.data_tools import generate_chart_data
 from utils.llm_client import LLMClient, LLMUnavailableError
 from utils.pdf_generator import generate_pdf
 
@@ -40,32 +41,25 @@ Critical Requirements:
 - Your detailed_analysis sections must read like professional research notes, not generic AI output
 - Think step by step before each tool call - explain what you're investigating and why
 
-Output your final analysis as a JSON object with this structure:
+Output your final analysis as a JSON object with this EXACT structure:
 {
-  "thesis": "Professional title like 'Positive Trend with Near-Term Headwinds' or 'Consolidation Risk After Extended Rally'",
+  "thesis": "Professional title like 'Positive Trend with Near-Term Headwinds'",
   "signal": "BULLISH" | "BEARISH" | "NEUTRAL",
   "confidence": "HIGH" | "MEDIUM" | "LOW",
   "current_price": 321.18,
   "summary": "2-3 sentence executive summary matching professional tone",
   "detailed_analysis": {
-    "price_structure": "Describe channel, trend, pattern with EXACT LEVELS (e.g., 'consolidating below 336-supply zone within rising channel 250-350')",
-    "momentum": "RSI/MACD findings with EXACT VALUES (e.g., 'RSI in low-70s showing mild bearish divergence')",  
-    "key_levels": "Support/resistance with EXACT LEVELS (e.g., 'immediate support 305-300, followed by 280-275; resistance at 336')",
-    "volume": "Volume context (e.g., 'declining volume on recent rally suggests limited follow-through')",
-    "market_relative": "vs KSE-100 and sector (e.g., 'outperforming sector by 12% YTD')"
+    "trend": "Describe the trend with EXACT LEVELS (required field)",
+    "momentum": "RSI/MACD findings with EXACT VALUES (required field)",  
+    "key_levels": "Support/resistance with EXACT LEVELS (required field)",
+    "volume_context": "Volume context description (required field)",
+    "market_context": "vs KSE-100 and sector context (required field)"
   },
   "key_levels": {
-    "immediate_support": [305, 300],
-    "secondary_support": [280, 275],
+    "support": [305, 300],
+    "resistance": [336, 340],
     "stop_loss": 265,
-    "immediate_resistance": [336, 340],
-    "targets": [358, 360]
-  },
-  "strategy": {
-    "bias": "cautiously bullish" | "defensive" | "aggressive bullish" | "bearish",
-    "entry_zones": ["305-300", "280-275"],
-    "profit_taking": "partial profit-taking below 336",
-    "invalidation": "weekly close below 265 would invalidate bullish stance"
+    "target": 358
   },
   "evidence_chain": [
     "Price consolidated below 336 after mild rejection",
@@ -76,15 +70,17 @@ Output your final analysis as a JSON object with this structure:
     "Near-term overbought (RSI 70+)",
     "Supply zone at 336 capping upside"
   ],
+  "final_commentary": "A comprehensive paragraph explaining the overall outlook, strategy, volume patterns, market context, and risk management. This should be at least 3-4 sentences long and provide a complete picture of the trading opportunity.",
   "chart_config": {
     "ticker": "TICKER",
     "period": "6M",
-    "overlays": ["SMA_9", "SMA_20", "RSI"],
-    "fibonacci": {"swing_low": 265, "swing_high": 336},
-    "channels": [{"type": "rising", "lower": 250, "upper": 350}],
+    "overlays": ["SMA(9)", "SMA(50)", "SMA(200)", "BB(20)"],
+    "annotations": ["Support", "Resistance"],
     "style": "dark"
   }
 }
+
+IMPORTANT: The fields "trend", "momentum", "key_levels", "volume_context", "market_context" are REQUIRED in detailed_analysis. The "final_commentary" field is REQUIRED at the root level.
 """
 
 
@@ -197,12 +193,60 @@ async def run_analyst_agent(
                         reasoning_trace.append(error_step)
                         return
 
+                    # Prepare chart config with data
                     chart_config = analysis_json.get("chart_config", {})
                     chart_config.setdefault("ticker", ticker)
                     chart_config.setdefault("period", "6M")
                     chart_config.setdefault("style", "dark")
+                    
+                    # Generate chart data with indicators for frontend
+                    try:
+                        chart_data = generate_chart_data(ticker, chart_config.get("period", "6M"))
+                        chart_config["data"] = chart_data
+                        print(f"[DEBUG] Generated {len(chart_data)} chart data points")
+                    except Exception as e:
+                        print(f"[ERROR] Failed to generate chart data: {e}")
+                        chart_config["data"] = []
+                    
                     analysis_json["chart_config"] = chart_config
                     analysis_json["generated_at"] = _timestamp()
+                    
+                    # Ensure key_levels has required frontend fields
+                    key_levels = analysis_json.get("key_levels", {})
+                    if "support" not in key_levels:
+                        # Map from backend format to frontend format
+                        support = key_levels.get("immediate_support", [])
+                        if key_levels.get("secondary_support"):
+                            support.extend(key_levels.get("secondary_support", []))
+                        key_levels["support"] = support[:2] if support else []
+                    
+                    if "resistance" not in key_levels:
+                        resistance = key_levels.get("immediate_resistance", [])
+                        if key_levels.get("targets"):
+                            resistance.extend(key_levels.get("targets", []))
+                        key_levels["resistance"] = resistance[:2] if resistance else []
+                    
+                    if "target" not in key_levels and key_levels.get("targets"):
+                        key_levels["target"] = key_levels["targets"][0] if key_levels["targets"] else 0
+                    
+                    if "stop_loss" not in key_levels:
+                        key_levels["stop_loss"] = 0
+                    
+                    analysis_json["key_levels"] = key_levels
+                    
+                    # Ensure detailed_analysis has required frontend fields
+                    detailed = analysis_json.get("detailed_analysis", {})
+                    if "trend" not in detailed and "price_structure" in detailed:
+                        detailed["trend"] = detailed["price_structure"]
+                    if "volume_context" not in detailed and "volume" in detailed:
+                        detailed["volume_context"] = detailed["volume"]
+                    if "market_context" not in detailed and "market_relative" in detailed:
+                        detailed["market_context"] = detailed["market_relative"]
+                    analysis_json["detailed_analysis"] = detailed
+                    
+                    # Ensure final_commentary exists
+                    if "final_commentary" not in analysis_json:
+                        analysis_json["final_commentary"] = analysis_json.get("summary", "")
                     
                     # Try to generate chart and PDF, but don't fail if they error
                     chart_result = {"chart_base64": "", "chart_path": ""}

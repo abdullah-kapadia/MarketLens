@@ -108,5 +108,54 @@ def load_stock_data(ticker: str, period: str = "6M") -> dict[str, Any]:
     }
 
 
+def generate_chart_data(ticker: str, period: str = "6M") -> list[dict]:
+    """Generate chart data with OHLCV and technical indicators for frontend."""
+    try:
+        import pandas_ta as ta
+        
+        df = load_dataframe(ticker, period)
+        
+        # Calculate indicators
+        df['sma_9'] = ta.sma(df['Close'], length=9)
+        df['sma_50'] = ta.sma(df['Close'], length=50)
+        df['sma_200'] = ta.sma(df['Close'], length=200)
+        df['rsi'] = ta.rsi(df['Close'], length=14)
+        
+        # Bollinger Bands
+        bb = ta.bbands(df['Close'], length=20, std=2)
+        if bb is not None and not bb.empty:
+            # Find the correct column names (they may vary by pandas_ta version)
+            upper_col = [col for col in bb.columns if 'BBU' in col]
+            lower_col = [col for col in bb.columns if 'BBL' in col]
+            if upper_col:
+                df['upper_bb'] = bb[upper_col[0]]
+            if lower_col:
+                df['lower_bb'] = bb[lower_col[0]]
+        
+        # Convert to list of dicts for frontend
+        chart_data = []
+        for date, row in df.iterrows():
+            data_point = {
+                "date": date.strftime("%Y-%m-%d"),
+                "open": round(float(row['Open']), 2),
+                "high": round(float(row['High']), 2),
+                "low": round(float(row['Low']), 2),
+                "close": round(float(row['Close']), 2),
+                "volume": int(row['Volume']),
+            }
+            
+            # Add indicators (only if not NaN)
+            for indicator in ['sma_9', 'sma_50', 'sma_200', 'rsi', 'upper_bb', 'lower_bb']:
+                if indicator in row and pd.notna(row[indicator]):
+                    data_point[indicator] = round(float(row[indicator]), 2)
+            
+            chart_data.append(data_point)
+        
+        return chart_data
+    except Exception as e:
+        print(f"[ERROR] Failed to generate chart data: {e}")
+        return []
+
+
 if __name__ == "__main__":
     print(load_stock_data("OGDC", "6M"))

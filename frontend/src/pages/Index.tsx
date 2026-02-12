@@ -3,7 +3,7 @@ import { StockSelector } from "@/components/StockSelector";
 import { TerminalLog } from "@/components/TerminalLog";
 import { DocumentPreview } from "@/components/DocumentPreview";
 import { analyzeStock, listReports, getReportDetail } from "@/lib/api";
-import type { ReportDetail } from "@/lib/api-types";
+import type { ReportDetail, AgentStep } from "@/lib/api-types";
 
 const Index = () => {
   const [selectedTicker, setSelectedTicker] = useState("AAPL");
@@ -11,40 +11,64 @@ const Index = () => {
   const [reportReady, setReportReady] = useState(false);
   const [currentReport, setCurrentReport] = useState<ReportDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [sseEvents, setSseEvents] = useState<AgentStep[]>([]);
 
-  const handleInitialize = async () => {
+  const handleInitialize = useCallback(() => {
     setReportReady(false);
     setIsProcessing(true);
     setError(null);
     setCurrentReport(null);
-    
-    try {
-      // Call the analyze API
-      await analyzeStock(selectedTicker);
-      
-      // After analysis completes, fetch the latest report for this ticker
-      // Wait a bit for the report to be generated
-      setTimeout(async () => {
-        try {
-          const reportsResponse = await listReports({ ticker: selectedTicker, limit: 1 });
-          if (reportsResponse.reports.length > 0) {
-            // Fetch the full report detail
-            const reportDetail = await getReportDetail(reportsResponse.reports[0].id);
-            setCurrentReport(reportDetail);
-            setReportReady(true);
-          }
-        } catch (err) {
-          console.error("Error fetching report:", err);
-          // Still show UI as ready, will use fallback data
+    setSseEvents([]);
+
+    const onMessage = (step: AgentStep) => {
+      console.log('[Index] Processing step:', step.type, step);
+      setSseEvents((prev) => {
+        const updated = [...prev, step];
+        console.log('[Index] Updated sseEvents length:', updated.length);
+        return updated;
+      });
+
+      if (step.type === "complete") {
+        console.log('[Index] Complete event received!', step);
+        const reportId = step.report_id;
+        if (reportId) {
+          console.log('[Index] Fetching report details for:', reportId);
+          getReportDetail(reportId)
+            .then((reportDetail) => {
+              console.log('[Index] Report fetched successfully:', reportDetail);
+              setCurrentReport(reportDetail);
+              setReportReady(true);
+            })
+            .catch((err) => {
+              console.error("[Index] Error fetching report detail:", err);
+              setError("Analysis complete, but failed to fetch report details.");
+              setReportReady(true); // Still show ready, but with error
+            });
+        } else {
+          console.error("[Index] Complete event received without report_id.");
+          setError("Analysis completed, but no report ID was provided.");
           setReportReady(true);
         }
-      }, 1000);
-    } catch (err) {
-      console.error("Error analyzing stock:", err);
-      setError("Analysis failed, using fallback data");
-      setReportReady(true);
-    }
-  };
+      } else if (step.type === "error") {
+        setError(`Analysis failed: ${step.content || 'Unknown error'}`);
+        setReportReady(false); // Analysis failed, so report is not ready
+      }
+    };
+
+    const onError = (err: any) => {
+      console.error("SSE Error:", err);
+      setError("SSE connection error. Analysis might have failed.");
+      setIsProcessing(false);
+      setReportReady(false); // Analysis failed, so report is not ready
+    };
+
+    const onComplete = () => {
+      setIsProcessing(false);
+    };
+
+    analyzeStock(selectedTicker, onMessage, onError, onComplete);
+
+  }, [selectedTicker]);
 
   const handleComplete = useCallback(() => {
     setIsProcessing(false);
@@ -96,6 +120,7 @@ const Index = () => {
               isRunning={isProcessing}
               onComplete={handleComplete}
               ticker={selectedTicker}
+              sseEvents={sseEvents}
             />
           </div>
 

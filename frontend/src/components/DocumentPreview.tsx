@@ -9,6 +9,8 @@ interface DocumentPreviewProps {
 }
 
 export function DocumentPreview({ ticker, isReady, report }: DocumentPreviewProps) {
+  console.log('[DocumentPreview] Rendering - isReady:', isReady, 'report:', !!report);
+
   if (!isReady) {
     return (
       <div className="h-full flex items-center justify-center">

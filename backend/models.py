@@ -29,16 +29,16 @@ class AgentStep(BaseModel):
 
 
 class KeyLevels(BaseModel):
+    support: list[float]  # Required for frontend
+    resistance: list[float]  # Required for frontend
+    stop_loss: float  # Required for frontend
+    target: float  # Required for frontend
+    
+    # Optional detailed levels for internal use
     immediate_support: Optional[list[float]] = None
     secondary_support: Optional[list[float]] = None
     immediate_resistance: Optional[list[float]] = None
     targets: Optional[list[float]] = None
-    stop_loss: Optional[float] = None
-    
-    # Legacy fields for backwards compatibility
-    support: Optional[list[float]] = None
-    resistance: Optional[list[float]] = None
-    target: Optional[float] = None
 
 
 class TradingStrategy(BaseModel):
@@ -49,16 +49,30 @@ class TradingStrategy(BaseModel):
 
 
 class DetailedAnalysis(BaseModel):
-    price_structure: Optional[str] = None
-    momentum: Optional[str] = None
-    key_levels: Optional[str] = None
-    volume: Optional[str] = None
-    market_relative: Optional[str] = None
+    trend: str  # Required for frontend
+    momentum: str  # Required for frontend
+    key_levels: str  # Required for frontend
+    volume_context: str  # Required for frontend
+    market_context: str  # Required for frontend
     
-    # Legacy fields for backwards compatibility  
-    trend: Optional[str] = None
-    volume_context: Optional[str] = None
-    market_context: Optional[str] = None
+    # Optional detailed fields for internal use
+    price_structure: Optional[str] = None
+    market_relative: Optional[str] = None
+
+
+class ChartDataPoint(BaseModel):
+    date: str
+    open: float
+    high: float
+    low: float
+    close: float
+    volume: int
+    sma_9: Optional[float] = None
+    sma_50: Optional[float] = None
+    sma_200: Optional[float] = None
+    rsi: Optional[float] = None
+    upper_bb: Optional[float] = None
+    lower_bb: Optional[float] = None
 
 
 class ChartConfig(BaseModel):
@@ -69,6 +83,7 @@ class ChartConfig(BaseModel):
     fibonacci: Optional[dict] = None
     channels: Optional[list[dict]] = None
     style: Literal["dark", "light"] = "dark"
+    data: Optional[list[ChartDataPoint]] = []
 
 
 class AgentResult(BaseModel):
@@ -83,6 +98,7 @@ class AgentResult(BaseModel):
     evidence_chain: list[str]
     risk_factors: list[str]
     chart_config: ChartConfig
+    final_commentary: str  # Required for frontend
     generated_at: Optional[str] = None
 
 

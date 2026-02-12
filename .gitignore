@@ -1,0 +1,395 @@
+# ============================================================================
+# MarketLens .gitignore
+# Comprehensive ignore patterns for Python backend + React frontend
+# ============================================================================
+
+# ============================================================================
+# Environment & Secrets
+# ============================================================================
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+*.env
+**/.env
+
+# API keys and secrets
+secrets.json
+config.secret.json
+
+# ============================================================================
+# Python Backend
+# ============================================================================
+
+# Virtual environment
+backend/venv/
+backend/.venv/
+venv/
+.venv/
+ENV/
+env/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# pyenv
+.python-version
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# ============================================================================
+# Node.js / Frontend
+# ============================================================================
+
+# Dependencies
+frontend/node_modules/
+node_modules/
+jspm_packages/
+
+# Production builds
+frontend/dist/
+frontend/build/
+frontend/.vite/
+dist/
+build/
+
+# Testing
+coverage/
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea
+*.swp
+*.swo
+*~
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Yarn
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# ============================================================================
+# Database
+# ============================================================================
+
+# SQLite
+*.db
+*.sqlite
+*.sqlite3
+backend/data/*.db
+data/*.db
+
+# Database backups
+*.db.backup
+*.sql.backup
+
+# ============================================================================
+# Output / Generated Files
+# ============================================================================
+
+# PDF reports
+backend/output/
+output/
+*.pdf
+!docs/**/*.pdf
+
+# Charts and images (generated)
+backend/charts/
+charts/
+*.png
+!docs/**/*.png
+!frontend/public/**/*.png
+
+# Logs
+*.log
+logs/
+backend/logs/
+*.log.*
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# ============================================================================
+# Operating System
+# ============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ============================================================================
+# IDEs and Editors
+# ============================================================================
+
+# VSCode
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea_modules/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# JetBrains IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# NetBeans
+nbproject/private/
+build/
+nbbuild/
+nbdist/
+.nb-gradle/
+
+# ============================================================================
+# Package Managers
+# ============================================================================
+
+# pip
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Poetry
+poetry.lock
+
+# Pipenv
+Pipfile.lock
+
+# npm
+package-lock.json
+npm-debug.log*
+
+# Yarn
+yarn.lock
+yarn-error.log*
+
+# pnpm
+pnpm-lock.yaml
+
+# ============================================================================
+# Miscellaneous
+# ============================================================================
+
+# Backup files
+*.bak
+*.backup
+*.old
+*~
+
+# Compressed files
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Cache
+.cache/
+*.cache
+
+# ============================================================================
+# Project-Specific
+# ============================================================================
+
+# Claude Code memory (if present)
+.claude/
+
+# Git LFS
+.gitattributes
+
+# Large data files (if you don't want to commit CSV data)
+# Uncomment if CSVs are too large for git
+# data/*.csv
+# !data/config.json
+
+# Test outputs
+test-outputs/
+test_*.png
+test_*.pdf
+
+# Development databases
+dev.db
+test.db
+
+# ============================================================================
+# Keep These Files
+# ============================================================================
+
+# Keep directory structure
+!.gitkeep
+
+# Keep example/template files
+!*.example
+!*.template
+!.env.example
+
+# Keep documentation assets
+!docs/**/*
+!README*.md

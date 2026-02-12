@@ -1,82 +1,103 @@
 import { useEffect, useRef, useState } from "react";
+import { AgentStep } from "@/lib/api-types";
 
 interface LogEntry {
   status: "done" | "active" | "pending";
   text: string;
+  timestamp?: string;
 }
-
-const REPORT_STEPS: string[] = [
-  "CONNECTING TO MARKET DATA FEED",
-  "FETCHING OHLCV DATA",
-  "VALIDATING PRICE INTEGRITY",
-  "CALCULATING RSI (14-PERIOD)",
-  "CALCULATING MACD (12,26,9)",
-  "COMPUTING BOLLINGER BANDS",
-  "ANALYZING SUPPORT/RESISTANCE",
-  "RUNNING VOLUME PROFILE",
-  "GENERATING TREND ANALYSIS",
-  "COMPILING RISK METRICS",
-  "WRITING EXECUTIVE SUMMARY",
-  "FORMATTING REPORT LAYOUT",
-  "RENDERING CHARTS",
-  "FINALIZING DOCUMENT",
-];
 
 interface TerminalLogProps {
   isRunning: boolean;
-  onComplete: () => void;
+  onComplete: () => void; // This will now be primarily for signaling completion from parent
   ticker: string;
+  sseEvents: AgentStep[];
 }
 
-export function TerminalLog({ isRunning, onComplete, ticker }: TerminalLogProps) {
+// Helper function to format tool arguments
+function formatToolArgs(args: Record<string, any> | null): string {
+  if (!args) return "";
+  const entries = Object.entries(args);
+  if (entries.length === 0) return "";
+  return entries
+    .map(([key, value]) => {
+      if (typeof value === "string") return `${key}="${value}"`;
+      if (typeof value === "object") return `${key}={...}`;
+      return `${key}=${value}`;
+    })
+    .join(", ");
+}
+
+// Helper function to format observation results
+function formatObservation(result: any): string {
+  if (!result) return "null";
+  if (typeof result === "string") {
+    return result.length > 200 ? result.substring(0, 200) + "..." : result;
+  }
+  if (typeof result === "object") {
+    const str = JSON.stringify(result, null, 0);
+    return str.length > 200 ? str.substring(0, 200) + "...}" : str;
+  }
+  return String(result);
+}
+
+export function TerminalLog({ isRunning, onComplete, ticker, sseEvents }: TerminalLogProps) {
   const [entries, setEntries] = useState<LogEntry[]>([]);
-  const [currentStep, setCurrentStep] = useState(-1);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    console.log('[TerminalLog] useEffect triggered - isRunning:', isRunning, 'sseEvents.length:', sseEvents.length);
+
+    // Clear entries when analysis starts or stops
     if (!isRunning) {
       setEntries([]);
-      setCurrentStep(-1);
       return;
     }
 
-    setEntries([]);
-    setCurrentStep(0);
+    // Process SSE events into log entries
+    const newEntries: LogEntry[] = [];
+    sseEvents.forEach((step, i) => {
+      let text = "";
+      let status: LogEntry["status"] = "done";
 
-    const timers: ReturnType<typeof setTimeout>[] = [];
-
-    REPORT_STEPS.forEach((step, i) => {
-      // Show step as active
-      const showTimer = setTimeout(() => {
-        setEntries((prev) => [
-          ...prev.map((e) => ({ ...e, status: "done" as const })),
-          { status: "active" as const, text: step },
-        ]);
-        setCurrentStep(i);
-      }, i * 600 + 200);
-
-      timers.push(showTimer);
-
-      // Mark as done
-      if (i < REPORT_STEPS.length - 1) {
-        const doneTimer = setTimeout(() => {
-          setEntries((prev) =>
-            prev.map((e, idx) => (idx === i ? { ...e, status: "done" as const } : e))
-          );
-        }, (i + 1) * 600 + 100);
-        timers.push(doneTimer);
+      if (step.type === "reasoning") {
+        const reasoning = step.content || "";
+        const truncated = reasoning.length > 150 ? reasoning.substring(0, 150) + "..." : reasoning;
+        text = `[#${step.iteration}] REASONING: ${truncated}`;
+      } else if (step.type === "tool_call") {
+        const argsStr = step.tool_input ? formatToolArgs(step.tool_input) : "";
+        text = `[#${step.iteration}] TOOL CALL: ${step.tool_name}(${argsStr})`;
+      } else if (step.type === "observation") {
+        const resultStr = formatObservation(step.result);
+        text = `[#${step.iteration}] OBSERVATION: ${resultStr}`;
+      } else if (step.type === "error") {
+        text = `[#${step.iteration}] ERROR: ${step.content}${step.code ? ` (Code: ${step.code})` : ""}`;
+        status = "active"; // Mark error as active/critical
+      } else if (step.type === "complete") {
+        const execTime = step.execution_time_ms ? (step.execution_time_ms / 1000).toFixed(2) : "N/A";
+        const toolCalls = step.tool_calls_count || 0;
+        text = `ANALYSIS COMPLETE in ${execTime}s (${toolCalls} tool calls) | REPORT ID: ${step.report_id}`;
+      } else {
+        text = `UNKNOWN EVENT: ${JSON.stringify(step)}`;
       }
+
+      // Mark the last received step as active if analysis is still running
+      if (isRunning && i === sseEvents.length - 1 && step.type !== "complete" && step.type !== "error") {
+        status = "active";
+      }
+
+      newEntries.push({ status, text, timestamp: step.timestamp });
     });
 
-    // Complete
-    const completeTimer = setTimeout(() => {
-      setEntries((prev) => prev.map((e) => ({ ...e, status: "done" as const })));
-      onComplete();
-    }, REPORT_STEPS.length * 600 + 400);
-    timers.push(completeTimer);
+    console.log('[TerminalLog] Setting entries, count:', newEntries.length);
+    setEntries(newEntries);
 
-    return () => timers.forEach(clearTimeout);
-  }, [isRunning, onComplete]);
+    // Call onComplete only when the SSE stream signals completion
+    if (sseEvents.some(step => step.type === "complete")) {
+      onComplete();
+    }
+
+  }, [sseEvents, isRunning, onComplete]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -84,9 +105,9 @@ export function TerminalLog({ isRunning, onComplete, ticker }: TerminalLogProps)
     }
   }, [entries]);
 
-  const timestamp = () => {
-    const now = new Date();
-    return `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}:${now.getSeconds().toString().padStart(2, "0")}`;
+  const formatTimestamp = (dateString?: string) => {
+    const date = dateString ? new Date(dateString) : new Date();
+    return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}:${date.getSeconds().toString().padStart(2, "0")}`;
   };
 
   return (
@@ -113,7 +134,7 @@ export function TerminalLog({ isRunning, onComplete, ticker }: TerminalLogProps)
 
         {entries.map((entry, i) => (
           <div key={i} className="terminal-line-enter flex items-start gap-2">
-            <span className="text-background/40 shrink-0">{timestamp()}</span>
+            <span className="text-background/40 shrink-0">{formatTimestamp(entry.timestamp)}</span>
             <span className="shrink-0">
               {entry.status === "done" ? (
                 <span className="text-terminal-green">[✓]</span>
@@ -132,6 +153,13 @@ export function TerminalLog({ isRunning, onComplete, ticker }: TerminalLogProps)
           <div className="terminal-line-enter mt-2 pt-2 border-t border-background/20">
             <span className="text-terminal-green font-bold">
               [COMPLETE] REPORT FOR {ticker} GENERATED SUCCESSFULLY
+            </span>
+          </div>
+        )}
+         {entries.length > 0 && sseEvents.some(step => step.type === "error") && (
+          <div className="terminal-line-enter mt-2 pt-2 border-t border-background/20">
+            <span className="text-swiss-red font-bold">
+              [ERROR] ANALYSIS FOR {ticker} FAILED
             </span>
           </div>
         )}

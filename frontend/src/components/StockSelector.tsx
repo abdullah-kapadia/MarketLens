@@ -11,7 +11,7 @@ interface StockSelectorProps {
 
 export function StockSelector({ selected, onSelect, disabled }: StockSelectorProps) {
   const [open, setOpen] = useState(false);
-  const [stocks, setStocks] = useState<Stock[]>(FALLBACK_STOCKS.stocks);
+  const [stocks, setStocks] = useState<Stock[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -20,8 +20,8 @@ export function StockSelector({ selected, onSelect, disabled }: StockSelectorPro
         const response = await listStocks();
         setStocks(response.stocks);
       } catch (error) {
-        console.warn("Failed to fetch stocks from API, using fallback data:", error);
-        setStocks(FALLBACK_STOCKS.stocks);
+        // If API call fails, stocks will remain empty
+        console.error("Failed to fetch stocks from API:", error);
       } finally {
         setLoading(false);
       }

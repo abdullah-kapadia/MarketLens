@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import os
+import traceback
+from datetime import datetime
 from typing import AsyncGenerator, Optional
 
 from fastapi import FastAPI, HTTPException
@@ -60,36 +62,52 @@ async def analyze_stock(ticker: str) -> EventSourceResponse:
         raise HTTPException(status_code=404, detail=f"Ticker '{ticker}' not found")
 
     async def event_generator() -> AsyncGenerator[dict, None]:
-        async for step in run_analyst_agent(
-            ticker,
-            max_iterations=int(os.getenv("MAX_AGENT_ITERATIONS", "15")),
-            timeout_seconds=int(os.getenv("AGENT_TIMEOUT_SECONDS", "120")),
-        ):
-            payload = {
-                "type": step.type,
-                "iteration": step.iteration,
-                "timestamp": step.timestamp,
-            }
-            if step.type == "reasoning":
-                payload["content"] = step.content
-            elif step.type == "tool_call":
-                payload["tool_name"] = step.tool_name
-                payload["tool_input"] = step.tool_input
-            elif step.type == "observation":
-                try:
-                    payload["result"] = json.loads(step.content or "{}")
-                except json.JSONDecodeError:
-                    payload["result"] = step.content
-            elif step.type == "complete":
-                payload["report_id"] = step.report_id
-                payload["analysis"] = step.analysis.model_dump() if step.analysis else None
-                payload["execution_time_ms"] = step.execution_time_ms
-                payload["tool_calls_count"] = step.tool_calls_count
-            elif step.type == "error":
-                payload["content"] = step.content
-                payload["code"] = step.code
+        try:
+            async for step in run_analyst_agent(
+                ticker,
+                max_iterations=int(os.getenv("MAX_AGENT_ITERATIONS", "15")),
+                timeout_seconds=int(os.getenv("AGENT_TIMEOUT_SECONDS", "120")),
+            ):
+                payload = {
+                    "type": step.type,
+                    "iteration": step.iteration,
+                    "timestamp": step.timestamp,
+                }
+                if step.type == "reasoning":
+                    payload["content"] = step.content
+                elif step.type == "tool_call":
+                    payload["tool_name"] = step.tool_name
+                    payload["tool_input"] = step.tool_input
+                elif step.type == "observation":
+                    try:
+                        payload["result"] = json.loads(step.content or "{}")
+                    except json.JSONDecodeError:
+                        payload["result"] = step.content
+                elif step.type == "complete":
+                    payload["report_id"] = step.report_id
+                    payload["analysis"] = step.analysis.model_dump() if step.analysis else None
+                    payload["execution_time_ms"] = step.execution_time_ms
+                    payload["tool_calls_count"] = step.tool_calls_count
+                elif step.type == "error":
+                    payload["content"] = step.content
+                    payload["code"] = step.code
 
-            yield {"event": step.type, "data": json.dumps(payload)}
+                yield {"event": step.type, "data": json.dumps(payload)}
+        except Exception as exc:
+            # Surface any unexpected failure (e.g. missing/invalid LLM API
+            # key, which raises before the agent loop can yield its own
+            # "error" step) as a proper SSE event instead of letting the
+            # stream die silently and leave the client with a bare
+            # connection error.
+            traceback.print_exc()
+            payload = {
+                "type": "error",
+                "iteration": 0,
+                "timestamp": datetime.utcnow().isoformat(),
+                "content": f"{type(exc).__name__}: {exc}",
+                "code": "INTERNAL_ERROR",
+            }
+            yield {"event": "error", "data": json.dumps(payload)}
 
     return EventSourceResponse(event_generator())
 

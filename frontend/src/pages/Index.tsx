@@ -94,9 +94,9 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-screen overflow-hidden bg-background flex flex-col">
       {/* Top Bar */}
-      <div className="border-b border-border">
+      <div className="border-b border-border shrink-0">
         <div className="flex items-center justify-between px-6 py-3">
           <div className="flex items-center gap-4">
             <span className="font-mono text-[10px] font-bold tracking-[0.3em] text-muted-foreground">
@@ -113,9 +113,9 @@ const Index = () => {
       </div>
 
       {/* Main Grid */}
-      <div className="flex min-h-[calc(100vh-49px)]">
+      <div className="flex flex-1 min-h-0">
         {/* Left Column — Controls */}
-        <div className="w-1/4 min-w-[280px] max-w-[360px] border-r border-border flex flex-col">
+        <div className="w-1/4 min-w-[280px] max-w-[360px] border-r border-border flex flex-col shrink-0">
           {/* Header */}
           <div className="border-b border-border px-5 py-4">
             <h2 className="font-mono text-xs font-bold tracking-[0.2em]">AUTOMATED ANALYST</h2>
@@ -162,9 +162,9 @@ const Index = () => {
         </div>
 
         {/* Right Column — Preview Canvas */}
-        <div className="flex-1 bg-muted/30 overflow-auto">
+        <div className="flex-1 bg-muted/30 flex flex-col min-h-0">
           {/* Canvas Header */}
-          <div className="border-b border-border px-6 py-2 flex items-center justify-between bg-background">
+          <div className="border-b border-border px-6 py-2 flex items-center justify-between bg-background shrink-0">
             <div className="flex items-center gap-4">
               <span className="label-mono">Output Preview</span>
               {reportReady && (
@@ -179,11 +179,13 @@ const Index = () => {
           </div>
 
           {/* Document Preview Area */}
-          <DocumentPreview 
-            ticker={selectedTicker} 
-            isReady={reportReady} 
-            report={currentReport}
-          />
+          <div className="flex-1 overflow-auto">
+            <DocumentPreview
+              ticker={selectedTicker}
+              isReady={reportReady}
+              report={currentReport}
+            />
+          </div>
         </div>
       </div>
     </div>

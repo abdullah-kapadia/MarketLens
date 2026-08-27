@@ -51,13 +51,29 @@ export const analyzeStock = (
     eventSource.close();
   };
 
+  // Note: "error" is both a custom SSE event name the backend emits (an
+  // AgentStep with type "error", carrying JSON `data`) and the browser's
+  // built-in EventSource connection-error event (a plain Event with no
+  // `data`) -- both are dispatched to the same "error" listeners, so this
+  // handler has to distinguish them instead of assuming `event.data` exists.
   SSE_EVENT_TYPES.forEach((eventType) => {
-    eventSource.addEventListener(eventType, (event: MessageEvent) => {
+    eventSource.addEventListener(eventType, (event: Event) => {
+      const data = (event as MessageEvent).data;
+      if (typeof data !== "string") {
+        // A real connection-level failure, not an app-level error step.
+        onError(event);
+        close();
+        onComplete();
+        return;
+      }
+
       try {
-        const step = JSON.parse(event.data) as AgentStep;
+        const step = JSON.parse(data) as AgentStep;
         onMessage(step);
       } catch (err) {
         onError(err);
+        close();
+        onComplete();
         return;
       }
 
@@ -67,12 +83,6 @@ export const analyzeStock = (
       }
     });
   });
-
-  eventSource.onerror = (err) => {
-    onError(err);
-    close();
-    onComplete();
-  };
 
   return close;
 };

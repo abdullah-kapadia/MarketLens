@@ -1,6 +1,10 @@
 import axios from "axios";
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+// In production, requests go to a relative path so Vercel's rewrite
+// (see vercel.json) routes them to the backend service on the same origin.
+// In dev, default to the local FastAPI server unless overridden.
+export const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? "http://localhost:8000" : "");
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,

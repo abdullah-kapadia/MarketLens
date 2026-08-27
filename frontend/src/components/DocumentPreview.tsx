@@ -37,8 +37,8 @@ export function DocumentPreview({ ticker, isReady, report }: DocumentPreviewProp
     <div className="flex justify-center py-8 px-4">
       <div className="paper-sheet border border-border bg-background w-full max-w-2xl">
         {/* Document Header */}
-        <div className="border-b border-border px-10 py-8">
-          <div className="flex items-start justify-between">
+        <div className="border-b border-border px-5 sm:px-6 md:px-10 py-8">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-0">
             <div>
               <div className="label-mono text-[10px] mb-1">Technical Analysis Report</div>
               <h2 className="font-serif text-3xl font-bold tracking-tight">{ticker}</h2>
@@ -46,7 +46,7 @@ export function DocumentPreview({ ticker, isReady, report }: DocumentPreviewProp
                 {analysis.signal} • {analysis.confidence} CONFIDENCE
               </div>
             </div>
-            <div className="text-right font-mono text-[10px] text-muted-foreground space-y-0.5">
+            <div className="sm:text-right font-mono text-[10px] text-muted-foreground space-y-0.5">
               <div>DATE: {new Date(report?.generated_at || Date.now()).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "2-digit" }).toUpperCase()}</div>
               <div>CLASS: EQUITY</div>
               <div>STATUS: <span className="text-terminal-green">FINAL</span></div>
@@ -61,7 +61,7 @@ export function DocumentPreview({ ticker, isReady, report }: DocumentPreviewProp
         </div>
 
         {/* Thesis */}
-        <div className="border-b border-border px-10 py-6 bg-muted/20">
+        <div className="border-b border-border px-5 sm:px-6 md:px-10 py-6 bg-muted/20">
           <div className="label-mono mb-2">Investment Thesis</div>
           <p className="font-serif text-base font-semibold leading-relaxed text-foreground">
             {analysis.thesis}
@@ -69,7 +69,7 @@ export function DocumentPreview({ ticker, isReady, report }: DocumentPreviewProp
         </div>
 
         {/* Executive Summary */}
-        <div className="border-b border-border px-10 py-6">
+        <div className="border-b border-border px-5 sm:px-6 md:px-10 py-6">
           <div className="label-mono mb-3">Executive Summary</div>
           <p className="font-serif text-sm leading-relaxed text-foreground/80" style={{ textAlign: "justify" }}>
             {analysis.summary}
@@ -77,7 +77,7 @@ export function DocumentPreview({ ticker, isReady, report }: DocumentPreviewProp
         </div>
 
         {/* Technical Analysis Chart */}
-        <div className="border-b border-border px-10 py-6">
+        <div className="border-b border-border px-5 sm:px-6 md:px-10 py-6">
           <div className="label-mono mb-3">Price Action & Indicators</div>
           {analysis.chart_config.data && analysis.chart_config.data.length > 0 ? (
             <TechnicalChart 
@@ -95,7 +95,7 @@ export function DocumentPreview({ ticker, isReady, report }: DocumentPreviewProp
               </div>
             </div>
           )}
-          <div className="flex justify-between mt-2 font-mono text-[10px] text-muted-foreground">
+          <div className="flex flex-wrap md:flex-nowrap justify-between gap-x-3 gap-y-1 mt-2 font-mono text-[10px] text-muted-foreground">
             <span>PERIOD: {analysis.chart_config.period}</span>
             <span>INTERVAL: 1D</span>
             <span>OVERLAYS: {analysis.chart_config.overlays.join(", ")}</span>
@@ -103,7 +103,7 @@ export function DocumentPreview({ ticker, isReady, report }: DocumentPreviewProp
         </div>
 
         {/* Detailed Analysis */}
-        <div className="border-b border-border px-10 py-6">
+        <div className="border-b border-border px-5 sm:px-6 md:px-10 py-6">
           <div className="label-mono mb-3">Detailed Analysis</div>
           <div className="space-y-3 font-serif text-sm">
             <div>
@@ -130,7 +130,7 @@ export function DocumentPreview({ ticker, isReady, report }: DocumentPreviewProp
         </div>
 
         {/* Key Levels Table */}
-        <div className="border-b border-border px-10 py-6">
+        <div className="border-b border-border px-5 sm:px-6 md:px-10 py-6">
           <div className="label-mono mb-3">Key Price Levels</div>
           <div className="border border-border">
             <div className="flex items-center font-mono text-xs border-b border-border">
@@ -169,7 +169,7 @@ export function DocumentPreview({ ticker, isReady, report }: DocumentPreviewProp
         </div>
 
         {/* Evidence Chain */}
-        <div className="border-b border-border px-10 py-6">
+        <div className="border-b border-border px-5 sm:px-6 md:px-10 py-6">
           <div className="label-mono mb-3">Evidence Chain</div>
           <ul className="space-y-1.5 font-serif text-sm text-foreground/80">
             {analysis.evidence_chain.map((evidence, i) => (
@@ -182,7 +182,7 @@ export function DocumentPreview({ ticker, isReady, report }: DocumentPreviewProp
         </div>
 
         {/* Risk Factors */}
-        <div className="border-b border-border px-10 py-6">
+        <div className="border-b border-border px-5 sm:px-6 md:px-10 py-6">
           <div className="label-mono mb-3">Risk Factors</div>
           <ul className="space-y-1.5 font-serif text-sm text-foreground/80">
             {analysis.risk_factors.map((risk, i) => (
@@ -195,12 +195,12 @@ export function DocumentPreview({ ticker, isReady, report }: DocumentPreviewProp
         </div>
 
         {/* Final Commentary */}
-        <div className="px-10 py-6">
+        <div className="px-5 sm:px-6 md:px-10 py-6">
           <div className="label-mono mb-3">Final Commentary</div>
           <p className="font-serif text-sm leading-relaxed text-foreground/80" style={{ textAlign: "justify" }}>
             {analysis.final_commentary || analysis.summary}
           </p>
-          <div className="mt-6 pt-4 border-t border-border flex justify-between items-end">
+          <div className="mt-6 pt-4 border-t border-border flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2 sm:gap-0">
             <div className="font-mono text-[10px] text-muted-foreground">
               <div>GENERATED BY: AUTOMATED ANALYST v2.1.0</div>
               <div>DISCLAIMER: FOR INFORMATIONAL PURPOSES ONLY</div>

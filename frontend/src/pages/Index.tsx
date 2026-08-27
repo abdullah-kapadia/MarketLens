@@ -94,18 +94,18 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="h-screen overflow-hidden bg-background flex flex-col">
+    <div className="min-h-screen md:h-screen overflow-y-auto md:overflow-hidden bg-background flex flex-col">
       {/* Top Bar */}
       <div className="border-b border-border shrink-0">
-        <div className="flex items-center justify-between px-6 py-3">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-y-2 px-4 py-3 md:px-6">
+          <div className="flex items-center gap-2 md:gap-4">
             <span className="font-mono text-[10px] font-bold tracking-[0.3em] text-muted-foreground">
               THE
             </span>
             <h1 className="font-serif text-lg font-bold tracking-tight">Automated Analyst</h1>
           </div>
-          <div className="flex items-center gap-6 font-mono text-[10px] text-muted-foreground tracking-wider">
-            <span>SYS: ONLINE</span>
+          <div className="flex items-center gap-3 md:gap-6 font-mono text-[10px] text-muted-foreground tracking-wider">
+            <span className="hidden sm:inline">SYS: ONLINE</span>
             <span className="w-1.5 h-1.5 bg-terminal-green" />
             <span>{new Date().toLocaleDateString("en-US").toUpperCase()}</span>
           </div>
@@ -113,9 +113,9 @@ const Index = () => {
       </div>
 
       {/* Main Grid */}
-      <div className="flex flex-1 min-h-0">
+      <div className="flex flex-col md:flex-row flex-1 md:min-h-0">
         {/* Left Column — Controls */}
-        <div className="w-1/4 min-w-[280px] max-w-[360px] border-r border-border flex flex-col shrink-0">
+        <div className="w-full md:w-1/4 md:min-w-[280px] md:max-w-[360px] border-b md:border-b-0 md:border-r border-border flex flex-col shrink-0">
           {/* Header */}
           <div className="border-b border-border px-5 py-4">
             <h2 className="font-mono text-xs font-bold tracking-[0.2em]">AUTOMATED ANALYST</h2>
@@ -125,7 +125,7 @@ const Index = () => {
           </div>
 
           {/* Controls */}
-          <div className="flex-1 px-5 py-6 space-y-8">
+          <div className="px-5 py-6 space-y-8 md:flex-1">
             <StockSelector
               selected={selectedTicker}
               onSelect={setSelectedTicker}
@@ -144,12 +144,12 @@ const Index = () => {
           </div>
 
           {/* Trigger Button */}
-          <div className="p-5 border-t border-border mt-auto">
+          <div className="p-5 border-t border-border md:mt-auto">
             <button
               type="button"
               disabled={isProcessing}
               onClick={handleInitialize}
-              className="w-full py-4 bg-foreground text-background font-mono text-xs font-bold 
+              className="w-full py-4 bg-foreground text-background font-mono text-xs font-bold
                          tracking-[0.2em] uppercase border border-border
                          hover:bg-swiss-red hover:text-primary-foreground
                          active:translate-y-[1px]
@@ -162,9 +162,9 @@ const Index = () => {
         </div>
 
         {/* Right Column — Preview Canvas */}
-        <div className="flex-1 bg-muted/30 flex flex-col min-h-0">
+        <div className="bg-muted/30 flex flex-col md:flex-1 md:min-h-0">
           {/* Canvas Header */}
-          <div className="border-b border-border px-6 py-2 flex items-center justify-between bg-background shrink-0">
+          <div className="border-b border-border px-4 md:px-6 py-2 flex items-center justify-between bg-background shrink-0">
             <div className="flex items-center gap-4">
               <span className="label-mono">Output Preview</span>
               {reportReady && (
@@ -179,7 +179,7 @@ const Index = () => {
           </div>
 
           {/* Document Preview Area */}
-          <div className="flex-1 overflow-auto">
+          <div className="md:flex-1 md:overflow-auto">
             <DocumentPreview
               ticker={selectedTicker}
               isReady={reportReady}

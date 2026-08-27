@@ -233,7 +233,7 @@ ANTHROPIC_API_KEY=sk-ant-your-key-here
 
 # Model Configuration
 MODEL_PRIMARY=gpt-4o
-MODEL_FALLBACK=claude-sonnet-4-20250514
+MODEL_FALLBACK=claude-opus-5
 
 # Agent Settings
 MAX_AGENT_ITERATIONS=15
@@ -374,7 +374,7 @@ ANTHROPIC_API_KEY=sk-ant-...                  # Optional fallback
 
 # Model Configuration
 MODEL_PRIMARY=gpt-4o                          # Primary LLM
-MODEL_FALLBACK=claude-sonnet-4-20250514       # Fallback LLM
+MODEL_FALLBACK=claude-opus-5                  # Fallback LLM
 
 # Agent Settings
 MAX_AGENT_ITERATIONS=15                       # Max reasoning loops

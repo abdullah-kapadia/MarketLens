@@ -13,7 +13,7 @@ from sse_starlette.sse import EventSourceResponse
 from dotenv import load_dotenv
 
 from agents.analyst_agent import run_analyst_agent
-from database import get_report, get_report_pdf_path, get_reports, init_db
+from database import get_report, get_report_pdf_path, get_reports, init_db, seed_demo_report_if_empty
 from models import ErrorDetail, ErrorResponse, HealthResponse, ReportDetail, ReportListResponse, StockListResponse, StockSummary
 from tools.data_tools import load_config, load_dataframe, load_stock_data
 
@@ -45,6 +45,11 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup_event() -> None:
     await init_db()
+    try:
+        await seed_demo_report_if_empty()
+    except Exception:
+        # Seeding the demo report is a nice-to-have -- never block startup on it.
+        traceback.print_exc()
 
 
 def _error_response(code: str, message: str, status_code: int = 400) -> JSONResponse:

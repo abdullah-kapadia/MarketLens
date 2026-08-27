@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import json
 import os
+import uuid
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
 import aiosqlite
 
-from models import AgentStep, ReportDetail, ReportSummary
+from models import AgentResult, AgentStep, ChartConfig, ReportDetail, ReportSummary
 
 
 def _db_path() -> Path:
@@ -61,6 +63,65 @@ async def init_db() -> None:
             """
         )
         await db.commit()
+
+
+def _seed_report_path() -> Path:
+    return Path(__file__).parent / "data" / "seed_report.json"
+
+
+async def seed_demo_report_if_empty() -> None:
+    """Insert one pre-generated demo report on first run, so a new visitor
+    sees a finished report immediately instead of an empty state -- without
+    spending an LLM call just to look around."""
+    db_path = _db_path()
+    async with aiosqlite.connect(db_path) as db:
+        async with db.execute("SELECT COUNT(*) FROM reports") as cursor:
+            row = await cursor.fetchone()
+    if row and row[0] > 0:
+        return
+
+    seed_path = _seed_report_path()
+    if not seed_path.exists():
+        return
+
+    from tools.data_tools import generate_chart_data
+
+    seed = json.loads(seed_path.read_text(encoding="utf-8"))
+    ticker = seed["ticker"]
+
+    chart_config = ChartConfig(
+        ticker=ticker,
+        period="6M",
+        overlays=["SMA9", "SMA50", "SMA200", "RSI", "BB"],
+        style="dark",
+        data=generate_chart_data(ticker, "6M"),
+    )
+    analysis = AgentResult(
+        thesis=seed["thesis"],
+        signal=seed["signal"],
+        confidence=seed["confidence"],
+        summary=seed["summary"],
+        detailed_analysis=seed["detailed_analysis"],
+        key_levels=seed["key_levels"],
+        evidence_chain=seed["evidence_chain"],
+        risk_factors=seed["risk_factors"],
+        chart_config=chart_config,
+        final_commentary=seed["final_commentary"],
+        generated_at=datetime.now(timezone.utc).isoformat(),
+    )
+    report = ReportDetail(
+        id=f"demo-{ticker.lower()}-{uuid.uuid4().hex[:8]}",
+        ticker=ticker,
+        signal=analysis.signal,
+        confidence=analysis.confidence,
+        thesis=analysis.thesis,
+        generated_at=analysis.generated_at,
+        tool_calls_count=6,
+        execution_time_ms=18500,
+        analysis=analysis,
+        reasoning_trace=[],
+    )
+    await save_report(report)
 
 
 async def save_report(report: ReportDetail, pdf_path: str | None = None) -> None:

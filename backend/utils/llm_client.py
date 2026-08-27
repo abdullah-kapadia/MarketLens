@@ -146,8 +146,8 @@ class LLMClient:
     def __init__(self) -> None:
         self.anthropic_client = anthropic.AsyncAnthropic()
         self.openai_client = openai.AsyncOpenAI() if os.getenv("OPENAI_API_KEY") else None
-        self.primary = os.getenv("MODEL_PRIMARY", "gpt-5.6-luna")
-        self.fallback = os.getenv("MODEL_FALLBACK", "claude-haiku-4-5-20251001")
+        self.primary = os.getenv("MODEL_PRIMARY", "gpt-4o")
+        self.fallback = os.getenv("MODEL_FALLBACK", "claude-opus-5")
         self.anthropic_available = bool(os.getenv("ANTHROPIC_API_KEY"))
 
     async def create_message(
@@ -167,22 +167,26 @@ class LLMClient:
                 logger.warning("OpenAI failed: %s. Falling back to Anthropic.", e)
                 if not self.anthropic_available:
                     raise LLMUnavailableError("Both LLM providers unavailable") from e
-                return await self._call_anthropic_with_retry(messages, tools, system, temperature, max_tokens)
+                return await self._call_anthropic_with_retry(
+                    messages, tools, system, temperature, max_tokens, model=self.fallback
+                )
 
-        return await self._call_anthropic_with_retry(messages, tools, system, temperature, max_tokens)
+        return await self._call_anthropic_with_retry(
+            messages, tools, system, temperature, max_tokens, model=self.primary
+        )
 
     def _is_openai_primary(self) -> bool:
         return self.primary.lower().startswith("gpt")
 
     async def _call_anthropic_with_retry(
-        self, messages: list[dict], tools: list[dict], system: str, temperature: float, max_tokens: int
+        self, messages: list[dict], tools: list[dict], system: str, temperature: float, max_tokens: int, model: str
     ) -> UnifiedResponse:
         try:
-            return await self._call_anthropic(messages, tools, system, temperature, max_tokens)
+            return await self._call_anthropic(messages, tools, system, temperature, max_tokens, model=model)
         except (anthropic.APITimeoutError, anthropic.APIConnectionError, anthropic.InternalServerError) as e:
             logger.warning("Anthropic failed: %s. Retrying once...", e)
             try:
-                return await self._call_anthropic(messages, tools, system, temperature, max_tokens)
+                return await self._call_anthropic(messages, tools, system, temperature, max_tokens, model=model)
             except Exception:
                 if self.openai_client:
                     logger.warning("Anthropic retry failed. Falling back to OpenAI.")
@@ -190,11 +194,11 @@ class LLMClient:
                 raise LLMUnavailableError("Both LLM providers unavailable") from e
 
     async def _call_anthropic(
-        self, messages: list[dict], tools: list[dict], system: str, temperature: float, max_tokens: int
+        self, messages: list[dict], tools: list[dict], system: str, temperature: float, max_tokens: int, model: str
     ) -> UnifiedResponse:
         response = await asyncio.wait_for(
             self.anthropic_client.messages.create(
-                model=self.primary,
+                model=model,
                 max_tokens=max_tokens,
                 system=system,
                 messages=messages,

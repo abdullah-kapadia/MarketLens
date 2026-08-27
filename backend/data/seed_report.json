@@ -1,0 +1,33 @@
+{
+  "ticker": "OGDC",
+  "thesis": "Sustained Uptrend Nearing Upper Band Resistance",
+  "signal": "BULLISH",
+  "confidence": "MEDIUM",
+  "summary": "OGDC has advanced roughly 24% over the trailing six months, closing at 281.09 against a period low of 220.99 and high of 290.00. Price trades above the 9-day, 50-day and 200-day moving averages, confirming an intact uptrend, but the stock is now pressing its upper Bollinger Band with RSI(14) at 64.1 -- constructive, but stretched enough to favor a pause before the next leg higher.",
+  "detailed_analysis": {
+    "trend": "OGDC remains in a well-defined rising channel off the July low of 220.99, up roughly 24% over the past six months to close at 281.09. Price is trading above both the 9-day (271.36) and 50-day (261.64) moving averages, and well above the 200-day average (242.50), confirming an intact primary uptrend.",
+    "momentum": "RSI(14) sits at 64.1, firmly in bullish territory but approaching the overbought threshold near 70. Price is pressing the upper Bollinger Band (281.25), signalling the rally has room but is due for either a pause or a shallow pullback before the next leg higher.",
+    "key_levels": "Immediate support at 271 (9-day MA), with a deeper shelf at 261-262 (50-day MA and prior consolidation). Resistance sits at 283, then the six-month high of 290 -- a decisive close above 290 opens room toward 300.",
+    "volume_context": "Average daily volume over the period runs near 6.1M shares. The move off the December low to the current high was accompanied by above-average volume on up days (8.8M and 9.0M share sessions on Dec 11 and Dec 30), a constructive sign that the advance is demand-driven rather than thin.",
+    "market_context": "The move tracks a broader Energy-sector recovery on the PSX; OGDC's relative strength versus peers (PSO, PPL, MARI) has been improving, consistent with sector-wide accumulation rather than a stock-specific event."
+  },
+  "key_levels": {
+    "support": [271, 262],
+    "resistance": [283, 290],
+    "stop_loss": 261,
+    "target": 300
+  },
+  "evidence_chain": [
+    "Price closed at 281.09, +23.7% over the trailing six months, versus a period low of 220.99 (Jul 4) and a period high of 290.00 (mid-Dec).",
+    "The 9-day MA (271.36) and 50-day MA (261.64) are both rising, and price trades above both -- trend alignment across timeframes.",
+    "RSI(14) at 64.1 shows bullish momentum without extreme overbought conditions (>70).",
+    "Price is testing the upper Bollinger Band (281.25), consistent with a strong trending move rather than a reversal signal.",
+    "Above-average volume on the two largest up days of the period (Dec 11, Dec 30) supports genuine demand behind the rally."
+  ],
+  "risk_factors": [
+    "Price sitting at the upper Bollinger Band raises the odds of a near-term consolidation or pullback toward the 271 support before further gains.",
+    "A break below the 50-day MA (261.64) would weaken the medium-term trend structure and should be treated as an early warning.",
+    "Energy-sector names remain sensitive to global crude price swings and PSX-wide sentiment, both outside company-specific control."
+  ],
+  "final_commentary": "OGDC's technical structure favors continuation of the primary uptrend, but the stock is stretched into resistance and due some digestion of recent gains. Strategy favors accumulating on dips toward 271-262 rather than chasing strength into 283-290, with a stop below the 50-day MA. A confirmed close above 290 would validate a fresh leg toward 300."
+}

@@ -146,8 +146,8 @@ class LLMClient:
     def __init__(self) -> None:
         self.anthropic_client = anthropic.AsyncAnthropic()
         self.openai_client = openai.AsyncOpenAI() if os.getenv("OPENAI_API_KEY") else None
-        self.primary = os.getenv("MODEL_PRIMARY", "gpt-5-nano-2025-08-07")
-        self.fallback = os.getenv("MODEL_FALLBACK", "claude-sonnet-4-20250514")
+        self.primary = os.getenv("MODEL_PRIMARY", "gpt-4o")
+        self.fallback = os.getenv("MODEL_FALLBACK", "claude-opus-5")
         self.anthropic_available = bool(os.getenv("ANTHROPIC_API_KEY"))
 
     async def create_message(

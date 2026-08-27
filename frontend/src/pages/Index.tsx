@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { StockSelector } from "@/components/StockSelector";
 import { TerminalLog } from "@/components/TerminalLog";
 import { DocumentPreview } from "@/components/DocumentPreview";
@@ -12,6 +12,25 @@ const Index = () => {
   const [currentReport, setCurrentReport] = useState<ReportDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [sseEvents, setSseEvents] = useState<AgentStep[]>([]);
+
+  // Show the most recently generated report on load, so a new visitor sees a
+  // finished result immediately instead of an empty state -- no need to run
+  // (and pay for) a fresh analysis just to see what a report looks like.
+  useEffect(() => {
+    listReports({ limit: 1 })
+      .then(({ reports }) => {
+        const latest = reports[0];
+        if (!latest) return;
+        return getReportDetail(latest.id).then((detail) => {
+          setCurrentReport(detail);
+          setSelectedTicker(detail.ticker);
+          setReportReady(true);
+        });
+      })
+      .catch((err) => {
+        console.error("[Index] Failed to load latest report:", err);
+      });
+  }, []);
 
   const handleInitialize = useCallback(() => {
     setReportReady(false);
